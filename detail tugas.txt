@@ -1,0 +1,18 @@
+DETIL TUGAS utk minggu depan :
+- Berkelompok, 1 kelompok 4 orang
+Tugas Programming :
+- Buat aplikasi chatting
+- Server harus dibuat dengan bahasa C
+- Klien bisa dibuat dengan bahasa pemrograman apapun asal menggunakan GUI, boleh berupa aplikasi mobile juga.
+- Format pesannya menggunakan ASCII / teks biasa
+- Fitur yang harus ada : daftar user online dan private message
+- Project harus diupload di github/bitbucket KETIKA PERTAMA DIBUAT, bukan setelah selesai dan jangan lupa di-push setiap ada perubahan. Pastikan setiap mahasiswa menggunakan user yang BERBEDA. Bukan 1 user dipakai ramai2. Ini untuk melatih bekerja secara tim.
+- Minggu depan project ini akan dinilai lgsg dari git dan dari dokumentasi program yang dibuat.
+Tugas Diskusi :
+- Buatlah presentasi dan dokumen laporan hasil diskusi untuk mengamankan aplikasi chatting anda dari sisi kerahasiaan data.
+- Beberapa kelompok akan mempresentasikan hasilnya minggu depan. Tetapi semua kelompok tetap membuat, karena minggu depan semua harus siap ditunjuk.
+- Diskusikan ttg :
+1. Algoritma apa saja yang mau digunakan (bisa lebih dari 1). Termasuk mode operasi yang akan digunakan, jika menggunakan enkripsi blok. Jelaskan alasannya.
+2. Apa saja yang mau dienkripsi (keseluruhan isi pesan, sebagian saja, atau yang lain)
+3. Bagaimana mendistribusikan key (disimpan di aplikasi, dikirim, atau yang lain).
+- Buatlah presentasi yang singkat dan padat,tidak perlu dasar teori dkk
