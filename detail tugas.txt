@@ -16,3 +16,5 @@ Tugas Diskusi :
 2. Apa saja yang mau dienkripsi (keseluruhan isi pesan, sebagian saja, atau yang lain)
 3. Bagaimana mendistribusikan key (disimpan di aplikasi, dikirim, atau yang lain).
 - Buatlah presentasi yang singkat dan padat,tidak perlu dasar teori dkk
+
+
