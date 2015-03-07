@@ -20,15 +20,15 @@
 #define MAX_NAME_LENGTH 16
 #define MAX_BUFFER 100
 
-typedef struct node {
+typedef struct node_t {
 	int id;
 	int socketfd;
 	char name[MAX_NAME_LENGTH];
-	struct node *next;
-} node;
+	struct node_t *next;
+} node_t;
 
 /* Global variables */
-node *list;
+node_t *list;
 pthread_t threads[MAX_THREADS];
 /* End of global variables */
 
@@ -44,10 +44,21 @@ void initialize() {
   * doesn't exist, return NULL.
   *
   * @param int id
+  *
   * @return node*|NULL
   */
-node *find(int id) {
+node_t *find(int id) {
+	return _find(list, id);
+}
 
+node_t *_find(node_t *node, int id) {
+	if (node == NULL) {
+		return NULL;
+	}
+	if (node->id == id) {
+		return node;
+	}
+	return _find(node->next, id);
 }
 
  /**
@@ -59,25 +70,30 @@ node *find(int id) {
   *
   * @return node*
   */
- node *new(int id, int socketfd, char *name) {
- 	node *ans;
+ node_t *new_node(int id, int socketfd, char *name) {
+	node_t *ans;
 
- 	ans = (node *)malloc(sizeof(node));
- 	ans->id = id;
- 	ans->socketfd = socketfd;
- 	strcpy(ans->name, name);
- 	ans->next = NULL;
+	ans = (node_t *)malloc(sizeof(node_t));
+	ans->id = id;
+	ans->socketfd = socketfd;
+	strcpy(ans->name, name);
+	ans->next = NULL;
 
- 	return ans;
- }
+	return ans;
+}
 
  /**
   * Add given node to the list.
   *
   * @param node*
   */
-void push(node *x) {
-
+void push(node_t *node) {
+	if (list == NULL) {
+		list = x;
+	} else {
+		node->next = list;
+		list = node;
+	}
 }
 
  /**
@@ -85,10 +101,25 @@ void push(node *x) {
   * is success, return 1. Otherwise, return 0.
   *
   * @param int id
+  *
   * @return int 1|0
   */
 int pop(int id) {
-
+	temp = list;
+	if (list->id == id) {
+		list = list->next;
+		free(temp);
+		return 1;
+	}
+	while (temp->next != null) {
+		if (temp->next->id == id) {
+			temp->next = temp->next->next;
+			free(temp->next);
+			return 1;
+		}
+		temp = temp->next;
+	}
+	return 0;
 }
 
  /**
@@ -125,17 +156,17 @@ ssize_t my_read(int fd, void *buf, size_t count) {
   * Client maint thread.
   */
 void *client_thread(void *arg) {
-	node *data;
+	node_t *data;
 	int id;
 	int socketfd;
 	char name[MAX_NAME_LENGTH];
 
-	data = (node *)arg;
+	data = (node_t *)arg;
 	id = data->id;
 	socketfd = data->socketfd;
 	strcpy(name, data->name);
 
-	printf(" (%d) Entering thread. Socket = %d\n", id, socketfd);
+	printf(" (%d) Entering thread.\n", id, socketfd);
 
 	char buffer[MAX_BUFFER];
 	int ln = 1;
@@ -179,7 +210,7 @@ int main(int argc, char const *argv[]) {
 		int clientsock = accept(servsock, (struct sockaddr*) NULL, NULL);
 		printf(" (%d) Accept client with socket descriptor %d\n", i, clientsock);
 
-		node *pi = new(i, clientsock, "Name");
+		node_t *pi = new_node(i, clientsock, "Name");
 		pthread_create(&threads[i], NULL, client_thread, (void *)pi);
 	}
 
