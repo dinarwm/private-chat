@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <signal.h>
@@ -15,16 +16,20 @@
 
 #define PORT 22001
 #define MAX_QUEUES 10
+#define MAX_THREADS 256
+#define MAX_NAME_LENGTH 16
+#define MAX_BUFFER 100
 
 typedef struct node {
 	int id;
 	int socketfd;
-	char name[16];
+	char name[MAX_NAME_LENGTH];
 	struct node *next;
 } node;
 
 /* Global variables */
 node *list;
+pthread_t threads[MAX_THREADS];
 /* End of global variables */
 
  /**
@@ -37,6 +42,27 @@ node *list;
 node *find(int id) {
 
 }
+
+ /**
+  * New node.
+  *
+  * @param int id
+  * @param int socketfd
+  * @param char* name
+  *
+  * @return node*
+  */
+ node *new(int id, int socketfd, char *name) {
+ 	node *ans;
+
+ 	ans = (node *)malloc(sizeof(node));
+ 	ans->id = id;
+ 	ans->socketfd = socketfd;
+ 	strcpy(ans->name, name);
+ 	ans->next = NULL;
+
+ 	return ans;
+ }
 
  /**
   * Add given node to the list.
@@ -54,7 +80,7 @@ void push(node *x) {
   * @param int id
   * @return int 1|0
   */
-int remove(int id) {
+int pop(int id) {
 
 }
 
@@ -65,7 +91,38 @@ void initialize() {
 	list = NULL;
 }
 
+ /**
+  * Client maint thread.
+  */
+void *client_thread(void *arg) {
+	node *data;
+	int id;
+	int socketfd;
+	char name[MAX_NAME_LENGTH];
+
+	data = (node *)arg;
+	id = data->id;
+	socketfd = data->socketfd;
+	strcpy(name, data->name);
+
+	printf(" (%d) Entering thread. Socket = %d\n", id, socketfd);
+
+	char buffer[MAX_BUFFER];
+	int ln = 1;
+	while (ln > 0) {
+		bzero(buffer, MAX_BUFFER);
+		ln = read(socketfd, buffer, MAX_BUFFER);
+		printf(" (%d) Recv: \"%s\"\n", id, buffer);
+		printf(" (%d) Len: %d\n", id, ln);
+		write(socketfd, buffer, strlen(buffer)+1);
+		printf(" (%d) Send: \"%s\"\n", id, buffer);
+	}
+	close(socketfd);
+	printf(" (%d) Close client with socket descriptor %d\n", id, socketfd);
+}
+
 int main(int argc, char const *argv[]) {
+	close(4);
 	struct sockaddr_in servaddr;
 
 	int servsock = socket(AF_INET, SOCK_STREAM, 0);
@@ -87,18 +144,13 @@ int main(int argc, char const *argv[]) {
 	int i;
 	for (i = 1; isLoop; i++) {
 		int clientsock = accept(servsock, (struct sockaddr*) NULL, NULL);
-		printf(" (%d) Accept client with file descriptor %d\n", i, clientsock);
+		printf(" (%d) Accept client with socket descriptor %d\n", i, clientsock);
 
-		char str[100];
-		bzero(str, 100);
-		read(clientsock, str, 100);
-		printf(" (%d) Recv: \"%s\"\n", i, str);
-		write(clientsock, str, strlen(str)+1);
-		printf(" (%d) Send: \"%s\"\n", i, str);
-
-		close(clientsock);
-		printf(" (%d) Close client with file descriptor %d\n", i, clientsock);
+		node *pi = new(i, clientsock, "Name");
+		pthread_create(&threads[i], NULL, client_thread, (void *)pi);
 	}
+
+	printf("Server is closing.");
 
 	return 0;
 }
