@@ -16,14 +16,10 @@
 #define PORT 22001
 #define MAX_QUEUES 10
 
-typedef struct client_data {
-	char name[16];
-	int socketfd;
-} client_data;
-
 typedef struct node {
 	int id;
-	client_data data;
+	int socketfd;
+	char name[16];
 	struct node *next;
 } node;
 
