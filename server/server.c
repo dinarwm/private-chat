@@ -33,6 +33,13 @@ pthread_t threads[MAX_THREADS];
 /* End of global variables */
 
  /**
+  * Initialize global variables.
+  */
+void initialize() {
+	list = NULL;
+}
+
+ /**
   * Get node from the list by given id. If it 
   * doesn't exist, return NULL.
   *
@@ -85,10 +92,33 @@ int pop(int id) {
 }
 
  /**
-  * Initialize global variables.
+  * Soft override to write().
+  *
+  * @param int sockfd file descriptor of the sending socket.
+  * @param void *buf message.
+  * @param size_t len length of the message.
+  *
+  * @return ssize_t the number of characters sent.
   */
-void initialize() {
-	list = NULL;
+ssize_t my_write(int sockfd, void *buf, size_t len) {
+	ssize_t ans;
+	ans = write(sockfd, buf, len);
+	return ans;
+}
+
+ /**
+  * Soft override to read().
+  *
+  * @param int fd file descriptor of the sender socket.
+  * @param void *buf buffer that will filled with message.
+  * @param size_t count max length of the message.
+  *
+  * @return ssize_t the number of bytes received.
+  */
+ssize_t my_read(int fd, void *buf, size_t count) {
+	ssize_t ans;
+	ans = read(fd, buf, count);
+	return ans;
 }
 
  /**
@@ -111,16 +141,19 @@ void *client_thread(void *arg) {
 	int ln = 1;
 	while (ln > 0) {
 		bzero(buffer, MAX_BUFFER);
-		ln = read(socketfd, buffer, MAX_BUFFER);
+		ln = my_read(socketfd, buffer, MAX_BUFFER);
 		printf(" (%d) Recv: \"%s\"\n", id, buffer);
 		printf(" (%d) Len: %d\n", id, ln);
-		write(socketfd, buffer, strlen(buffer)+1);
+		my_write(socketfd, buffer, strlen(buffer)+1);
 		printf(" (%d) Send: \"%s\"\n", id, buffer);
 	}
 	close(socketfd);
 	printf(" (%d) Close client with socket descriptor %d\n", id, socketfd);
 }
 
+ /**
+  * Main program.
+  */
 int main(int argc, char const *argv[]) {
 	close(4);
 	struct sockaddr_in servaddr;
