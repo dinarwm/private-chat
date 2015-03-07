@@ -70,7 +70,7 @@ node_t *_find(node_t *node, int id) {
   *
   * @return node*
   */
- node_t *new_node(int id, int socketfd, char *name) {
+node_t *new_node(int id, int socketfd, char *name) {
 	node_t *ans;
 
 	ans = (node_t *)malloc(sizeof(node_t));
@@ -153,7 +153,7 @@ ssize_t my_read(int fd, void *buf, size_t count) {
 }
 
  /**
-  * Client maint thread.
+  * Client main thread.
   *
   * @param node_t *arg client who started this thread.
   */
