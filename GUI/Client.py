@@ -31,10 +31,10 @@ class Login(Frame):
 class Chatting(Frame):
         def __init__(self,master):
                 Frame.__init__(self,master)
+                self.grid()
                 self.create_widget()
                 
         def create_widget(self):
-                self.grid()
                 self.Text_Chat = Text(self, bd=2, bg="white", height="20", width="42", font="Arial")
                 self.Text_Chat.config(state=DISABLED)
                 self.Scroll_Bar = Scrollbar(self, command=self.Text_Chat.yview, cursor="heart")
@@ -46,6 +46,24 @@ class Chatting(Frame):
                 self.Text_Chat.grid(row=1,columnspan=5)
                 self.Entry_Box.grid(row=2,columnspan=3)
                 self.Send_Button.grid(row=2,column=4,columnspan=2)
+
+class ListOnline(Frame):
+        def __init__(self,master):
+                Frame.__init__(self,master)
+                self.grid()
+                self.create_widget()
+                
+        def create_widget(self):
+                self.Label_Password = Label(self,text = "Online Users")
+                self.Label_Password.pack()
+                MODES = [("Monochrome", "1"),("Grayscale", "L"),("True color", "RGB"),("Color separation", "CMYK"),]
+                for text, mode in MODES:
+                        self.Radio = Radiobutton(self, text=text,
+                                        variable="Online", value = mode)
+                        self.Radio.pack(anchor=W)
+                self.Button_Submit = Button(self,text = "Chat")
+                self.Button_Submit.pack(padx=50,pady=5)
+                
         
 client = socket.socket()
 client.connect(('localhost', 7891))
@@ -53,7 +71,7 @@ client.connect(('localhost', 7891))
 root = Tk()
 root.title("Chat Application")
 
-app = Chatting(root)
+app = ListOnline(root)
 
 root.mainloop()
 print client.recv(1024)
