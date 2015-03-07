@@ -21,12 +21,58 @@ typedef struct client_data {
 	int socketfd;
 } client_data;
 
-int servsock;
+typedef struct node {
+	int id;
+	client_data data;
+	struct node *next;
+} node;
+
+/* Global variables */
+node *list;
+/* End of global variables */
+
+ /**
+  * Get node from the list by given id. If it 
+  * doesn't exist, return NULL.
+  *
+  * @param int id
+  * @return node*|NULL
+  */
+node *find(int id) {
+
+}
+
+ /**
+  * Add given node to the list.
+  *
+  * @param node*
+  */
+void push(node *x) {
+
+}
+
+ /**
+  * Remove node from the list by given id. If removing
+  * is success, return 1. Otherwise, return 0.
+  *
+  * @param int id
+  * @return int 1|0
+  */
+int remove(int id) {
+
+}
+
+ /**
+  * Initialize global variables.
+  */
+void initialize() {
+	list = NULL;
+}
 
 int main(int argc, char const *argv[]) {
 	struct sockaddr_in servaddr;
 
-	servsock = socket(AF_INET, SOCK_STREAM, 0);
+	int servsock = socket(AF_INET, SOCK_STREAM, 0);
 	printf("Server socket created.\n");
 
 	bzero(&servaddr, sizeof(servaddr));
