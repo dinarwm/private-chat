@@ -154,6 +154,8 @@ ssize_t my_read(int fd, void *buf, size_t count) {
 
  /**
   * Client maint thread.
+  *
+  * @param node_t *arg client who started this thread.
   */
 void *client_thread(void *arg) {
 	node_t *data;
@@ -174,12 +176,15 @@ void *client_thread(void *arg) {
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
 		printf(" (%d) Recv: \"%s\"\n", id, buffer);
-		printf(" (%d) Len: %d\n", id, ln);
+
 		my_write(socketfd, buffer, strlen(buffer)+1);
 		printf(" (%d) Send: \"%s\"\n", id, buffer);
 	}
+	pop(id);
 	close(socketfd);
 	printf(" (%d) Close client with socket descriptor %d\n", id, socketfd);
+
+	return NULL;
 }
 
  /**
@@ -205,13 +210,14 @@ int main(int argc, char const *argv[]) {
 	printf("Listen to max %d queues.\n", MAX_QUEUES);
 
 	int isLoop = 1;
-	int i;
-	for (i = 1; isLoop; i++) {
+	int id;
+	for (id = 1; isLoop; id++) {
 		int clientsock = accept(servsock, (struct sockaddr*) NULL, NULL);
-		printf(" (%d) Accept client with socket descriptor %d\n", i, clientsock);
+		printf(" (%d) Accept client with socket descriptor %d\n", id, clientsock);
 
-		node_t *pi = new_node(i, clientsock, "Name");
-		pthread_create(&threads[i], NULL, client_thread, (void *)pi);
+		node_t *pi = new_node(id, clientsock, "Name");
+		push(pi);
+		pthread_create(&threads[id], NULL, client_thread, (void *)pi);
 	}
 
 	printf("Server is closing.");

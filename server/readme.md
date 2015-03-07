@@ -1,25 +1,17 @@
+# server.c
+
+### I'm dying trying explaining
+
+Setiap client harus memasukkan nama. Tapi nama ini nggak 
+jadi primary key.
 ```c
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <signal.h>
-#include <pthread.h>
-
-#define PORT 22001
-#define MAX_QUEUES 10
-
 typedef struct client_data {
+	int id;
 	char name[16];
 	int socketfd;
 } client_data;
 
 typedef struct node {
-	int id;
 	client_data data;
 	struct node *next;
 } node;
