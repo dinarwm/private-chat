@@ -1,0 +1,10 @@
+- client membuka program (masukkan ip dan port server)
+- server mengirim sinyal 'connect'
+- program client menyuruh client inpur username
+- client memasukkan username, program client generate user:username
+- server cek username available
+- server menambahkan username, ID, data socket di list
+- server mengirim list nama online ke client
+- client mengetikkan username tujuan (klik)
+- client kalo mau ngirim pesan cukup ketik pesan, tapi program klien generate jadi send:ID:pesan sebelum dikirim ke server
+- server menerima pesan dari client, diteruskan ke username tujuan
