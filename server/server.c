@@ -32,21 +32,21 @@ node_t *list;
 pthread_t threads[MAX_THREADS];
 /* End of global variables */
 
- /**
-  * Initialize global variables.
-  */
+/**
+ * Initialize global variables.
+ */
 void initialize() {
 	list = NULL;
 }
 
- /**
-  * Get node from the list by given id. If it 
-  * doesn't exist, return NULL.
-  *
-  * @param int id
-  *
-  * @return node*|NULL
-  */
+/**
+ * Get node from the list by given id. If it 
+ * doesn't exist, return NULL.
+ *
+ * @param int id
+ *
+ * @return node*|NULL
+ */
 node_t *find(int id) {
 	return _find(list, id);
 }
@@ -61,15 +61,15 @@ node_t *_find(node_t *node, int id) {
 	return _find(node->next, id);
 }
 
- /**
-  * New node.
-  *
-  * @param int id
-  * @param int socketfd
-  * @param char* name
-  *
-  * @return node*
-  */
+/**
+ * New node.
+ *
+ * @param int id
+ * @param int socketfd
+ * @param char* name
+ *
+ * @return node*
+ */
 node_t *new_node(int id, int socketfd, char *name) {
 	node_t *ans;
 
@@ -82,11 +82,11 @@ node_t *new_node(int id, int socketfd, char *name) {
 	return ans;
 }
 
- /**
-  * Add given node to the list.
-  *
-  * @param node*
-  */
+/**
+ * Add given node to the list.
+ *
+ * @param node*
+ */
 void push(node_t *node) {
 	if (list == NULL) {
 		list = x;
@@ -96,14 +96,14 @@ void push(node_t *node) {
 	}
 }
 
- /**
-  * Remove node from the list by given id. If removing
-  * is success, return 1. Otherwise, return 0.
-  *
-  * @param int id
-  *
-  * @return int 1|0
-  */
+/**
+ * Remove node from the list by given id. If removing
+ * is success, return 1. Otherwise, return 0.
+ *
+ * @param int id
+ *
+ * @return int 1|0
+ */
 int pop(int id) {
 	temp = list;
 	if (list->id == id) {
@@ -122,41 +122,41 @@ int pop(int id) {
 	return 0;
 }
 
- /**
-  * Soft override to write().
-  *
-  * @param int sockfd file descriptor of the sending socket.
-  * @param void *buf message.
-  * @param size_t len length of the message.
-  *
-  * @return ssize_t the number of characters sent.
-  */
+/**
+ * Soft override to write().
+ *
+ * @param int sockfd file descriptor of the sending socket.
+ * @param void *buf message.
+ * @param size_t len length of the message.
+ *
+ * @return ssize_t the number of characters sent.
+ */
 ssize_t my_write(int sockfd, void *buf, size_t len) {
 	ssize_t ans;
 	ans = write(sockfd, buf, len);
 	return ans;
 }
 
- /**
-  * Soft override to read().
-  *
-  * @param int fd file descriptor of the sender socket.
-  * @param void *buf buffer that will filled with message.
-  * @param size_t count max length of the message.
-  *
-  * @return ssize_t the number of bytes received.
-  */
+/**
+ * Soft override to read().
+ *
+ * @param int fd file descriptor of the sender socket.
+ * @param void *buf buffer that will filled with message.
+ * @param size_t count max length of the message.
+ *
+ * @return ssize_t the number of bytes received.
+ */
 ssize_t my_read(int fd, void *buf, size_t count) {
 	ssize_t ans;
 	ans = read(fd, buf, count);
 	return ans;
 }
 
- /**
-  * Client main thread.
-  *
-  * @param node_t *arg client who started this thread.
-  */
+/**
+ * Client main thread.
+ *
+ * @param node_t *arg client who started this thread.
+ */
 void *client_thread(void *arg) {
 	node_t *data;
 	int id;
@@ -187,9 +187,9 @@ void *client_thread(void *arg) {
 	return NULL;
 }
 
- /**
-  * Main program.
-  */
+/**
+ * Main program.
+ */
 int main(int argc, char const *argv[]) {
 	close(4);
 	struct sockaddr_in servaddr;
