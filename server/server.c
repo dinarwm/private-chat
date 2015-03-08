@@ -123,6 +123,17 @@ int pop(int id) {
 }
 
 /**
+ * Handles new client.
+ *
+ * @param int id generated from main.
+ * @param int socket descriptor of new client.
+ */
+void handle_accept(int id, int clientsock) {
+	node_t *node = new_node(id, clientsock, "undefined");
+	pthread_create(&threads[id], NULL, client_thread, (void *)node);
+}
+
+/**
  * Soft override to write().
  *
  * @param int sockfd file descriptor of the sending socket.
@@ -170,12 +181,16 @@ void *client_thread(void *arg) {
 
 	printf(" (%d) Entering thread.\n", id, socketfd);
 
+	// harusnya disini dimintain nama client nya
+
 	char buffer[MAX_BUFFER];
 	int ln = 1;
 	while (ln > 0) {
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
 		printf(" (%d) Recv: \"%s\"\n", id, buffer);
+
+		// harusnya disini ada handle protocol.
 
 		my_write(socketfd, buffer, strlen(buffer)+1);
 		printf(" (%d) Send: \"%s\"\n", id, buffer);
@@ -191,7 +206,6 @@ void *client_thread(void *arg) {
  * Main program.
  */
 int main(int argc, char const *argv[]) {
-	close(4);
 	struct sockaddr_in servaddr;
 
 	int servsock = socket(AF_INET, SOCK_STREAM, 0);
@@ -214,10 +228,7 @@ int main(int argc, char const *argv[]) {
 	for (id = 1; isLoop; id++) {
 		int clientsock = accept(servsock, (struct sockaddr*) NULL, NULL);
 		printf(" (%d) Accept client with socket descriptor %d\n", id, clientsock);
-
-		node_t *pi = new_node(id, clientsock, "Name");
-		push(pi);
-		pthread_create(&threads[id], NULL, client_thread, (void *)pi);
+		handle_accept(id, clientsock);
 	}
 
 	printf("Server is closing.");
