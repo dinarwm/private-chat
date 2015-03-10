@@ -164,6 +164,52 @@ ssize_t my_read(int fd, void *buf, size_t count) {
 }
 
 /**
+ * Broadcast msg to all client.
+ *
+ * @param char *msg
+ */
+void broadcast(char *msg) {
+	node_t *temp = list;
+	while (temp != NULL) {
+		my_write(temp->socketfd, msg, strlen(msg) + 1);
+		temp = temp->next;
+	}
+}
+
+/**
+ * Create a userlist in a string format:
+ *   userlist:<id>#<name>:<id>#<name>\r\n
+ *
+ * @return char *userlist
+ */
+char *users() {
+	char ans[1024];
+	strcpy(ans, "users");
+	node_t *temp = list;
+	while (temp != NULL) {
+		sprintf(ans, "%s:%d#%s", ans, temp->id, temp->name);
+		temp = temp->next;
+	}
+	return ans;
+}
+
+/**
+ * Deliver the message to the recipient. Recipient id
+ * is attached in the message. First, convert the message
+ *   from : <recipient_id>:<message>\r\n
+ *   to   : rcv:<sender_id>:<message>\r\n
+ *
+ * @param node_t *sender node
+ * @param char *msg sent to server
+ */
+void deliver(node_t *sender, char *msg) {
+	char temp[strlen(msg) - 1];
+	int sender_id;
+	sscanf(msg, "%d:%s", &sender_id, temp);
+
+}
+
+/**
  * Client main thread.
  *
  * @param node_t *arg client who started this thread.
