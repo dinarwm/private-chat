@@ -1,10 +1,6 @@
 import socket
 import sys
-<<<<<<< HEAD
 import threading
-=======
-import thread
->>>>>>> db108d5d0b7cfae0a93f9cd33bb438e1188c0037
 
 host = '10.151.43.223'
 port = 22001
@@ -24,16 +20,11 @@ try:
         auth = msg.split(':')[1]
         if auth=='1':
             login = 1
-<<<<<<< HEAD
         else:
             print msg.split(':')[2]
     
     #bikin GUI list
-    
-=======
     print 'sukses login'
->>>>>>> db108d5d0b7cfae0a93f9cd33bb438e1188c0037
-
 except KeyboardInterrupt:
     s.close()
     sys.exit(0)
