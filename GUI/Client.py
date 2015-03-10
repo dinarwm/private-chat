@@ -66,7 +66,7 @@ class ListOnline(Frame):
                 
         
 client = socket.socket()
-client.connect(('localhost', 7891))
+client.connect(('10.151.43.223', 22001))
 
 root = Tk()
 root.title("Chat Application")
