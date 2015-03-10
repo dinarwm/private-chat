@@ -4,8 +4,9 @@ import thread
 
 host = '10.151.43.223'
 port = 22001
-size = 1024
+size = 2048
 login = 0
+listuser = {}
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((host,port))
 
@@ -23,7 +24,21 @@ try:
         else:
             print msg.split(':')[2]
     #bikin GUI list
-    print 'sukses login'
+
+    msg = s.recv(size)
+    words = msg.split(':')
+    a = 0
+    for word in words:
+        if a == 0:
+            a=a+1
+            pass
+        else:
+            iduser = word.split('#')[0]
+            username = word.split('#')[1]
+            listuser[iduser] = username
+
+    for x in listuser:
+        print x+' : '+listuser[x]
     
 except KeyboardInterrupt:
     s.close()

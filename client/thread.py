@@ -48,7 +48,7 @@ class Server:
                     destination = sys.stdin.readline()
                     #GUI buka layar
                     #STUCK -______-
-                    cmd = 'send:'+destination+':
+                    cmd = 'connect:'+destination
                     running = 0
  
         # close all threads
