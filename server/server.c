@@ -215,7 +215,7 @@ void broadcast(char *msg) {
  * Then broadcast to all connected client.
  */
 void users() {
-	char ans[1024];
+	char ans[2048];
 	sprintf(ans, "users");
 	node_t *temp = list;
 	while (temp != NULL) {
@@ -236,12 +236,8 @@ void users() {
  *
  * @return node_t|NULL client.
  */
-node_t *login(node_t *client) {
-	char buffer[MAX_BUFFER];
-	bzero(buffer, MAX_BUFFER);
+node_t *login(node_t *client, char buffer[]) {
 	int socketfd = client->socketfd;
-
-	my_read(socketfd, buffer, MAX_BUFFER);
 
 	char *ptr;
 
@@ -257,9 +253,19 @@ node_t *login(node_t *client) {
 	ptr = strtok(NULL, ":\r\n");
 	printf(" (%d) Name: %s\n", client->id, ptr);
 
-	if (strlen(ptr) > MAX_NAME_LENGTH) {
+	if (strchr(ptr, ':') || strchr(ptr, '#')) {
+		printf(" (%d) Name contains forbidden character: '%s'.\n", client->id, ptr);
+		sprintf(buffer, "auth:0:Name invalid.\r\n");
+		my_write(socketfd, buffer, strlen(buffer)+1);
+		return NULL;
+	} else if (strlen(ptr) > MAX_NAME_LENGTH) {
 		printf(" (%d) Name is too long: '%s'.\n", client->id, ptr);
 		sprintf(buffer, "auth:0:Name length more than %d.\r\n", MAX_NAME_LENGTH);
+		my_write(socketfd, buffer, strlen(buffer)+1);
+		return NULL;
+	} else if (strlen(ptr) < 4) {
+		printf(" (%d) Name is too short: '%s'.\n", client->id, ptr);
+		sprintf(buffer, "auth:0:Name length less than 4.\r\n");
 		my_write(socketfd, buffer, strlen(buffer)+1);
 		return NULL;
 	} else if (find_by_name(ptr) != NULL) {
@@ -278,7 +284,8 @@ node_t *login(node_t *client) {
 
 /**
  * Do logout. Close the socket descriptor. Broadcast to all
- * online users if someone is logout. Finally pop the node_t.
+ * online users if someone is logout. Broadcast to all online
+ * users the new online userlist. Finally pop the node_t.
  *
  * @param node_t *client.
  */
@@ -334,7 +341,9 @@ void *client_thread(void *arg) {
 	node_t *data;
 	int id;
 	int socketfd;
+	int ln;
 	char name[MAX_NAME_LENGTH +1];
+	char buffer[MAX_BUFFER];
 
 	data = (node_t *)arg;
 	id = data->id;
@@ -342,16 +351,24 @@ void *client_thread(void *arg) {
 
 	printf(" (%d) Entering thread.\n", id);
 
-	while (login(data) == NULL) {
-		printf(" (%d) Login failed.\n", id);
+	while (1) {
+		bzero(buffer, MAX_BUFFER);
+		ln = my_read(socketfd, buffer, MAX_BUFFER);
+		if (ln == 0) {
+			printf(" (%d) Quit while login.\n", id);
+			logout(data);
+			return NULL;
+		}
+		if (login(data, buffer) != NULL) {
+			break;
+		}
 	}
 
 	printf(" (%d) Login success.\n", id);
 	push(data);
 	users();
 
-	char buffer[MAX_BUFFER];
-	int ln = 1;
+	ln = 1;
 	while (ln > 0) {
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
@@ -360,6 +377,11 @@ void *client_thread(void *arg) {
 		char *ptr;
 		ptr = strtok(buffer, "\r\n");
 		printf(" (%d) Recv: \"%s\"\n", id, ptr);
+
+		// char *chr = strchr(ptr, ':');
+		// if (chr == NULL) {
+		// 	logout(data);
+		// }
 
 		ptr = strtok(NULL, ":");
 
@@ -372,7 +394,6 @@ void *client_thread(void *arg) {
 			my_write(socketfd, buffer, strlen(buffer)+1);
 			printf(" (%d) Send: Unknown command\n", id);
 		}
-
 	}
 	logout(data);
 
