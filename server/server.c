@@ -238,8 +238,12 @@ void users() {
  */
 node_t *login(node_t *client, char buffer[]) {
 	int socketfd = client->socketfd;
-
 	char *ptr;
+
+	if (strlen(buffer) < 6) {
+		printf(" (%d) Error login.\n", client->id);
+		return NULL;
+	}
 
 	ptr = strtok(buffer, ":\r\n");
 
@@ -324,11 +328,12 @@ void deliver(node_t *sender, char *msg) {
 	if (recipient == NULL) {
 		printf(" (%d) User with %d is offline.\n", sender->id, recipient_id);
 		sprintf(buffer, "off:%d\r\n", recipient_id);
-		my_write(sender->socketfd, buffer, sizeof(buffer) + 1);
+		my_write(sender->socketfd, buffer, strlen(buffer) + 1);
 	} else {
 		msg = strtok(NULL, "\r\n");
 		sprintf(temp, "rcv:%d:%s\r\n", sender->id, msg);
 		printf(" (%d) Send: rcv:%d:%s\n", sender->id, sender->id, msg);
+		my_write(recipient->socketfd, temp, strlen(temp) + 1);
 	}
 }
 
@@ -383,10 +388,10 @@ void *client_thread(void *arg) {
 		// 	logout(data);
 		// }
 
-		ptr = strtok(NULL, ":");
+		ptr = strtok(ptr, ":");
 
 		if (!strcmp(ptr, "quit")) {
-			logout(data);
+			break;
 		} else if (!strcmp(ptr, "send")) {
 			deliver(data, ptr);
 		} else {
