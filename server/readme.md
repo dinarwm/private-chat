@@ -363,6 +363,6 @@ Kalau udah keluar dari main loop. Client memutus koneksi.
 ```
 
 ## To do
-- Masalah login. Username validation, blablabla.
-- Bikin fungsi `handle_protocol`, dipanggil dari `client_thread`.
-- Broadcast list user jika ada client baru masuk.
+- Masalah login. masih bug
+- Bug kalau ada escape character dari client
+- `\r\n` itu kepakai ga ya?
