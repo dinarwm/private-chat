@@ -2,15 +2,27 @@
 
 ### Metode Pengamanan
 
-Metode yang digunakan adalah *Diffie-Hellman*, *Viginere*, dan *Playfair*.
+Metode yang digunakan adalah *Diffie-Hellman*, *Blum Blum Shub*,  *Viginere*, dan *Playfair*.
 
 ### Penjelasan
 
-Program yang dibuat harus benar-benar aman. Pesan yang dikirim oleh client ke client lainnya harus di*enkripsi* dengan key yang hanya diketahui setiap pasangan client tersebut. Bahkan server pun tidak boleh tahu bagaimana cara mendekripsi pesan. Oleh karena itu program ini akan menggunakan __*Diffie-Hellman Key Exchange*__ sebagai metode mengrimkan kunci.
+Program yang dibuat harus benar-benar aman. Pesan yang dikirim oleh client ke client lainnya harus di*enkripsi* dengan key yang hanya diketahui setiap pasangan client tersebut. Bahkan server pun tidak boleh tahu bagaimana cara mendekripsi pesan. Oleh karena itu program ini akan menggunakan *Diffie-Hellman Key Exchange* sebagai metode mengrimkan kunci.
 
 Intinya adalah setiap hubungan *clien-client* dan *client-server* akan mempunyai kunci masing-masing yang hanya diketahui masing-masing pasangan. Setiap client yang baru terhubung ke server dan berhasil login, akan berbagi kunci. Lalu client akan berbagi kunci dengan semua client yang terhubung.
 
-Pada saat pengiriman `pesan` dari *client1* ke *client2*, *client1* akan mengenkripsi `recipient` dengan kunci server. *client1* juga akan mengenkripsi `pesan` dengan kunci *client2*. Lalu setelah *client1* mengirim `pesan` melalui server, server hanya bisa mengenkripsi `recipient` pengiriman `pesan` saja tanpa bisa mengenkripsi `pesan`. Server akan mengenkripsi `sender` dengen kunci *client2* dan mengirimkan ke *client2*. Akhirnya *client2* akan mengenkripsi `sender` dengan kunci server dan mengenkripsi `pesan` dengan kunci *client1*.
+Nilai yang dibentuk dari hasil *Diffie-Hellman Key Exchange* hanya berupa sebuah angka, maka kita harus membuat *pseudo-random* dari sebuah angka menjadi sebuah kunci yang acak. Oleh karena itu kita akan membuat kunci sesungguhnya dengan menggunakan metode *Blum Blum Shub*.
+
+Kira-kira seperti ini distribusi kunci yang dihasilkan. Kolom dan baris menunjukkan hubungan komunikasi dan kunci apa yang digunakan.
+
+ | **Server** | **Alice** | **Bob** | **Cecil** | **Damon**
+--- | --- | --- | --- | --- | ---
+**Server** | | *aliceserverkey* | *bobserverkey* | *cecilserverkey* | *damonserverkey*
+**Alice** | *aliceserverkey* | | *bobalicekey* | *cecilalicekey* | *damonalicekey*
+**Bob** | *bobserverkey* | *bobalicekey* | | *cecilbobkey* | *damonbobkey*
+**Cecil** | *cecilserverkey* | *cecilalicekey* | *cecilbobkey* | | *damoncecilkey*
+**Damon** | *damonserverkey* | *damonalicekey* | *damonbobkey* | *damoncecilkey* |
+
+Pada saat pengiriman `pesan` dari *client1* ke *client2*, *client1* akan mengenkripsi `recipient` dengan kunci *server*. *client1* juga akan mengenkripsi `pesan` dengan kunci *client2*. Lalu setelah *client1* mengirim `pesan` melalui *server*, *server* hanya bisa mengenkripsi `recipient` pengiriman `pesan` saja tanpa bisa mengenkripsi `pesan`. *Server* akan mengenkripsi `sender` dengen kunci *client2* dan mengirimkan ke *client2*. Akhirnya *client2* akan mengenkripsi `sender` dengan kunci *server* dan mengenkripsi `pesan` dengan kunci *client1*.
 
 ### Sekenario
 
