@@ -22,7 +22,7 @@ Kira-kira seperti ini distribusi kunci yang dihasilkan. Kolom dan baris menunjuk
 **Cecil** | *cecilserverkey* | *cecilalicekey* | *cecilbobkey* | | *damoncecilkey*
 **Damon** | *damonserverkey* | *damonalicekey* | *damonbobkey* | *damoncecilkey* |
 
-Pada saat pengiriman `pesan` dari *client1* ke *client2*, *client1* akan mengenkripsi `recipient` dengan kunci *server*. *client1* juga akan mengenkripsi `pesan` dengan kunci *client2*. Lalu setelah *client1* mengirim `pesan` melalui *server*, *server* hanya bisa mengenkripsi `recipient` pengiriman `pesan` saja tanpa bisa mengenkripsi `pesan`. *Server* akan mengenkripsi `sender` dengen kunci *client2* dan mengirimkan ke *client2*. Akhirnya *client2* akan mengenkripsi `sender` dengan kunci *server* dan mengenkripsi `pesan` dengan kunci *client1*.
+Pada saat pengiriman `pesan` dari *client1* ke *client2*, *client1* akan mengenkripsi `recipient` dengan kunci *server*. *Client1* juga akan mengenkripsi `pesan` dengan kunci *client2*. Lalu setelah *client1* mengirim `pesan` melalui *server*, *server* hanya bisa mendekripsi `recipient` saja tanpa bisa mendekripsi `pesan`. *Server* akan mengenkripsi `sender` dengen kunci *client2* dan mengirimkan ke *client2* bersamaan dengan `pesan`. Akhirnya *client2* akan mengenkripsi `sender` dengan kunci *server* dan mengenkripsi `pesan` dengan kunci *client1*.
 
 ### Sekenario
 
