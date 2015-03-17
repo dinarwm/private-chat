@@ -46,13 +46,14 @@ class Server:
                     #username tujuan diklik,
                     #program client memasukkan username tujuan ke var destination
                     destination = sys.stdin.readline()
-                    #GUI buka layar
+                    #GUI buka layar chat baru
                     #STUCK -______-
-                    cmd = 'connect:'+destination
-                    running = 0
+                    c = Client(self.server.accept())
+                    c.start()
+                    self.threads.append(c)
  
         # close all threads
-         self.server.close()
+        self.server.close()
         for c in self.threads:
             c.join()
 
