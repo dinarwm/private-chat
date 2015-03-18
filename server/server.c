@@ -420,13 +420,21 @@ int main(int argc, char const *argv[]) {
 	int servsock = socket(AF_INET, SOCK_STREAM, 0);
 	printf("Server socket created.\n");
 
+	/* credit to pak Bas and Djuned */
+	int opt = 1;
+	setsockopt(servsock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt));
+	printf("Socket options: SO_REUSEADDR.\n");
+
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
 	servaddr.sin_port = htons(PORT);
 	printf("Server address created.\n");
 
-	bind(servsock, (struct sockaddr *) &servaddr, sizeof(servaddr));
+	if (bind(servsock, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+		printf("Binding failed.\n");
+		exit(3);
+	}
 	printf("Binding success.\n");
 
 	listen(servsock, MAX_QUEUES);
