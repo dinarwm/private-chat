@@ -340,7 +340,7 @@ void deliver(node_t *sender, char *msg) {
 /**
  * Client main thread.
  *
- * @param node_t *arg client who started this thread.
+ * @param node_t *arg client data who started this thread.
  */
 void *client_thread(void *arg) {
 	node_t *data;
@@ -350,12 +350,13 @@ void *client_thread(void *arg) {
 	char name[MAX_NAME_LENGTH +1];
 	char buffer[MAX_BUFFER];
 
+	/* Get client data from main() */
 	data = (node_t *)arg;
 	id = data->id;
 	socketfd = data->socketfd;
-
 	printf(" (%d) Entering thread.\n", id);
 
+	/* Login */
 	while (1) {
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
@@ -364,32 +365,34 @@ void *client_thread(void *arg) {
 			logout(data);
 			return NULL;
 		}
+		/* Authorizing */
 		if (login(data, buffer) != NULL) {
 			break;
 		}
 	}
 
+	/* Push this client to the linked list */
 	printf(" (%d) Login success.\n", id);
 	push(data);
+
+	/* Broadcast new user list */
 	users();
 
+	/* Chatting loop */
 	ln = 1;
 	while (ln > 0) {
+		/* Read message from client */
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
 		if (ln <= 0) break;
 
+		/* Remove the trailing newline */
 		char *ptr;
 		ptr = strtok(buffer, "\r\n");
 		printf(" (%d) Recv: \"%s\"\n", id, ptr);
 
-		// char *chr = strchr(ptr, ':');
-		// if (chr == NULL) {
-		// 	logout(data);
-		// }
-
+		/* Processing protocol */
 		ptr = strtok(ptr, ":");
-
 		if (!strcmp(ptr, "quit")) {
 			break;
 		} else if (!strcmp(ptr, "send")) {
@@ -400,6 +403,8 @@ void *client_thread(void *arg) {
 			printf(" (%d) Send: Unknown command\n", id);
 		}
 	}
+
+	/* Logout and leave thread */ 
 	logout(data);
 
 	return NULL;
@@ -409,37 +414,37 @@ void *client_thread(void *arg) {
  * Main program.
  */
 int main(int argc, char const *argv[]) {
-	close(4);
-	close(5);
-	close(6);
-	close(7);
-	close(8);
-	close(9);
 	struct sockaddr_in servaddr;
+	int servsock;
 
-	int servsock = socket(AF_INET, SOCK_STREAM, 0);
+	/* Create socket */
+	servsock = socket(AF_INET, SOCK_STREAM, 0);
 	printf("Server socket created.\n");
 
-	/* credit to pak Bas and Djuned */
+	/* Credit to pak Bas and Djuned */
 	int opt = 1;
 	setsockopt(servsock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt));
 	printf("Socket options: SO_REUSEADDR.\n");
 
+	/* Setup server address and port */
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
 	servaddr.sin_port = htons(PORT);
 	printf("Server address created.\n");
 
+	/* Binding socket */
 	if (bind(servsock, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
 		printf("Binding failed.\n");
 		exit(3);
 	}
 	printf("Binding success.\n");
 
+	/* Enable listen */
 	listen(servsock, MAX_QUEUES);
 	printf("Listen to max %d queues.\n", MAX_QUEUES);
 
+	/* Accepting clients */
 	int isLoop = 1;
 	int id;
 	for (id = 1; isLoop; id++) {

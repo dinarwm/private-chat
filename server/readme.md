@@ -290,7 +290,6 @@ void deliver(node_t *sender, char *msg) {
 Setiap ada client, langsung dibikinin `thread` baru, trus jalanin
 fungsi ini.
 
-### Definisi variabel
 ```c++
 void *client_thread(void *arg) {
 	node_t *data;
@@ -299,18 +298,14 @@ void *client_thread(void *arg) {
 	int ln;
 	char name[MAX_NAME_LENGTH +1];
 	char buffer[MAX_BUFFER];
-```
-### Inisialisasi data client
-Biar gampang manggilnya
-```c+++
+
+	/* Get client data from main() */
 	data = (node_t *)arg;
 	id = data->id;
 	socketfd = data->socketfd;
-```
-### Masuk ke alur program
-#### Login
-```c+++
 	printf(" (%d) Entering thread.\n", id);
+
+	/* Login */
 	while (1) {
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
@@ -319,29 +314,34 @@ Biar gampang manggilnya
 			logout(data);
 			return NULL;
 		}
+		/* Authorizing */
 		if (login(data, buffer) != NULL) {
 			break;
 		}
 	}
 
+	/* Push this client to the linked list */
 	printf(" (%d) Login success.\n", id);
 	push(data);
+
+	/* Broadcast new user list */
 	users();
-```
-#### Chatting
-```c+++
+
+	/* Chatting loop */
 	ln = 1;
 	while (ln > 0) {
+		/* Read message from client */
 		bzero(buffer, MAX_BUFFER);
 		ln = my_read(socketfd, buffer, MAX_BUFFER);
 		if (ln <= 0) break;
 
+		/* Remove the trailing newline */
 		char *ptr;
 		ptr = strtok(buffer, "\r\n");
 		printf(" (%d) Recv: \"%s\"\n", id, ptr);
 
+		/* Processing protocol */
 		ptr = strtok(ptr, ":");
-
 		if (!strcmp(ptr, "quit")) {
 			break;
 		} else if (!strcmp(ptr, "send")) {
@@ -352,13 +352,62 @@ Biar gampang manggilnya
 			printf(" (%d) Send: Unknown command\n", id);
 		}
 	}
-```
-### Finally
-Kalau udah keluar dari main loop. Client memutus koneksi.
-```c++
+
+	/* Logout and leave thread */ 
 	logout(data);
 
 	return NULL;
+}
+```
+
+## Main function
+Fungsi ``main()``.
+
+```c++
+int main(int argc, char const *argv[]) {
+	struct sockaddr_in servaddr;
+	int servsock;
+
+	/* Create socket */
+	servsock = socket(AF_INET, SOCK_STREAM, 0);
+	printf("Server socket created.\n");
+
+	/* Credit to pak Bas and Djuned */
+	int opt = 1;
+	setsockopt(servsock, SOL_SOCKET, SO_REUSEADDR, (char *)&opt, sizeof(opt));
+	printf("Socket options: SO_REUSEADDR.\n");
+
+	/* Setup server address and port */
+	bzero(&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
+	servaddr.sin_port = htons(PORT);
+	printf("Server address created.\n");
+
+	/* Binding socket */
+	if (bind(servsock, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+		printf("Binding failed.\n");
+		exit(3);
+	}
+	printf("Binding success.\n");
+
+	/* Enable listen */
+	listen(servsock, MAX_QUEUES);
+	printf("Listen to max %d queues.\n", MAX_QUEUES);
+
+	/* Accepting clients */
+	int isLoop = 1;
+	int id;
+	for (id = 1; isLoop; id++) {
+		int clientsock = accept(servsock, (struct sockaddr*) NULL, NULL);
+		printf(" (%d) Accept client with socket descriptor %d\n", id, clientsock);
+		node_t *node = new_node(id, clientsock, "undefined");
+		pthread_create(&threads[id], NULL, client_thread, (void *)node);
+	}
+
+	printf("Server is closing.");
+
+	return 0;
 }
 ```
 
