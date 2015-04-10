@@ -16,11 +16,14 @@ import java.util.logging.Logger;
  * @author achmads23
  */
 public class FormChat extends javax.swing.JFrame {
+    private static String id = null;
+    static String nama;
     public FormChat(String nama, String id) {
         initComponents();
         tfName.setEditable(false);
         tfName.setText(nama);
         FormChat.id = id;
+        setVisible(true);
     }
 
     /**
@@ -137,13 +140,7 @@ public class FormChat extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run(String nama,String id) {
-                new FormChat(nama,id).setVisible(true);
-            }
-
-            @Override
             public void run() {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         });
     }

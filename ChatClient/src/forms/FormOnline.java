@@ -5,6 +5,7 @@
  */
 package forms;
 
+import connection.ChatList;
 import static forms.FormLogin.conn;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -17,9 +18,11 @@ import java.util.logging.Logger;
  * @author achmads23
  */
 public class FormOnline extends javax.swing.JFrame {
+
     private Object jTextField1;
-    ArrayList<String> namas = new ArrayList<String>();
-    ArrayList<String> ids = new ArrayList<String>();
+    private ArrayList<String> namas = new ArrayList<String>();
+    private ArrayList<String> ids = new ArrayList<String>();
+
     /**
      * Creates new form FormOnline
      */
@@ -106,24 +109,18 @@ public class FormOnline extends javax.swing.JFrame {
     private void tfChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfChatActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfChatActionPerformed
-    
+
     private void btnChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChatActionPerformed
-        DataOutputStream dos;
-        try {
-            dos = new DataOutputStream(conn.getOutputStream());
-            String chat = tfChat.getText();
-            for (int i = 0; i<namas.size();i++) {
-                if (namas.get(i).equals(chat)) {
-                    String id = ids.get(i);
-                    
-                    // code buat manggil chat nya
-                    
-                    return;
-                }
-            }            
-        } catch (IOException ex) {
-            Logger.getLogger(FormOnline.class.getName()).log(Level.SEVERE, null, ex);
+        String chat = tfChat.getText();
+        for (int i = 0; i < namas.size(); i++) {
+            if (namas.get(i).equals(chat)) {
+                String id = ids.get(i);
+                ChatList.OpenForm(namas.get(i), id);
+                System.out.println("Cool!");
+                return;
+            }
         }
+        System.out.println("Wrong name.");
     }//GEN-LAST:event_btnChatActionPerformed
 
     /**
@@ -161,12 +158,21 @@ public class FormOnline extends javax.swing.JFrame {
             }
         });
     }
-    
+
+    public String getNama(String id) {
+        for (int i = 0; i < ids.size(); i++) {
+            if (id.equals(ids.get(i))) {
+                return namas.get(i);
+            }
+        }
+        return null;
+    }
+
     public void userUpdate(String users) {
         taListOnline.setText("");
         namas.clear();
         ids.clear();
-        int n = 0 ;
+        int n = 0;
         for (String retval : users.split(":")) {
             String[] idnama = retval.split("#");
             namas.add(idnama[1]);
