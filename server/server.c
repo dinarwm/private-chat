@@ -294,16 +294,18 @@ node_t *login(node_t *client, char buffer[]) {
  * @param node_t *client.
  */
 void logout(node_t *client) {
-	char buffer[16];
-	close(client->socketfd);
-	printf(" (%d) Close client with socket descriptor %d.\n", client->id, client->socketfd);
-	
-	sprintf(buffer, "off:%d\r\n", client->id);
-	broadcast(buffer);
-
 	int id = client->id;
+	char buffer[16];
+
+	close(client->socketfd);
+	printf(" (%d) Close client with socket descriptor %d.\n", id, client->socketfd);
+
 	int pop_return = pop(client->id);
 	printf(" (%d) Pop returns %d.\n", id, pop_return);
+
+	sprintf(buffer, "off:%d\r\n", id);
+	broadcast(buffer);
+	users();
 }
 
 /**
