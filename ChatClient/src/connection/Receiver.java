@@ -10,7 +10,6 @@ import forms.FormOnline;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import main.ChatClient;
@@ -20,7 +19,7 @@ import main.ChatClient;
  * @author achmads23
  */
 public class Receiver implements Runnable {
-    
+
     private Thread thread;
     private final FormOnline formonline;
     private final Socket conn;
@@ -41,15 +40,20 @@ public class Receiver implements Runnable {
                 String[] parts = string.split(":", 2);
                 String protocol = parts[0];
                 String msg = parts[1];
-                if ("users".equals(protocol)) {
-                    System.out.println("masuk protocol users");
-                    formonline.userUpdate(msg);
-                } else if ("rcv".equals(protocol)){
-                    parts = msg.split(":", 2);
-                    String id = parts[0];
-                    String nama = formonline.getNama(id);
-                    FormChat form = ChatList.OpenForm(nama,id);
-                    form.chatUpdate(nama + "\t:" + parts[1] );
+                if (null != protocol) {
+                    switch (protocol) {
+                        case "users":
+                            System.out.println("masuk protocol users");
+                            formonline.userUpdate(msg);
+                            break;
+                        case "rcv":
+                            parts = msg.split(":", 2);
+                            String id = parts[0];
+                            String nama = formonline.getNama(id);
+                            FormChat form = ChatList.OpenForm(nama, id);
+                            form.chatUpdate(nama + "\t: " + parts[1]);
+                            break;
+                    }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Receiver.class.getName()).log(Level.SEVERE, null, ex);

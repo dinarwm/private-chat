@@ -16,11 +16,14 @@ import java.util.logging.Logger;
  * @author achmads23
  */
 public class FormChat extends javax.swing.JFrame {
+    
     private static String id = null;
     static String nama;
+    
     public FormChat(String nama, String id) {
         initComponents();
         tfName.setEditable(false);
+        taChat.setEditable(false);
         tfName.setText(nama);
         FormChat.id = id;
         setVisible(true);
@@ -104,8 +107,14 @@ public class FormChat extends javax.swing.JFrame {
         try {
             DataOutputStream dos;
             dos = new DataOutputStream(conn.getOutputStream());
-            String input = "send:" + id + ":" + taInput.getText();
+            String msg = taInput.getText().trim();
+            if ("".equals(msg)) {
+                return;
+            }
+            String input = "send:" + id + ":" + msg;
             dos.write(input.getBytes());
+            taInput.setText("");
+            chatUpdate("You\t: " + msg);
         } catch (IOException ex) {
             Logger.getLogger(FormChat.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -145,8 +154,8 @@ public class FormChat extends javax.swing.JFrame {
         });
     }
     
-    public void chatUpdate(String Text) {
-        taChat.append(Text+"\n");
+    public void chatUpdate(String text) {
+        taChat.append(text + "\n");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
