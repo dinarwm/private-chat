@@ -11,8 +11,6 @@ import forms.FormOnline;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import main.ChatClient;
 
 /**
@@ -55,7 +53,7 @@ public class Receiver implements Runnable {
                 if (null != protocol) {
                     switch (protocol) {
                         case "auth":
-                            System.out.println("ada pesan (" + msg + ")");
+                            System.out.println("pesan (" + msg + ")");
                             if ("1:Login success.".equals(msg)) {
                                 formLogin.dispose();
                                 FormOnline online = new FormOnline();
@@ -73,15 +71,14 @@ public class Receiver implements Runnable {
                             parts = msg.split(":", 2);
                             String id = parts[0];
                             String nama = formOnline.getNama(id);
+                            String isi = parts[1];
                             FormChat form = ChatList.OpenForm(nama, id);
-                            form.chatUpdate(nama + "\t: " + parts[1]);
+                            form.chatUpdate(nama, isi);
                             break;
                     }
                 }
-            } catch (ArrayIndexOutOfBoundsException ex) {
-                System.out.println("Error array: " + ex.getMessage());
-            } catch (IOException ex) {
-                Logger.getLogger(Receiver.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ArrayIndexOutOfBoundsException | IOException ex) {
+                System.out.println("Error di thread: " + ex.getMessage());
             }
         }
     }

@@ -6,7 +6,6 @@ package main;
  * and open the template in the editor.
  */
 import forms.FormLogin;
-import forms.FormOnline;
 import connection.Receiver;
 import java.io.IOException;
 import java.net.Socket;
@@ -16,7 +15,7 @@ import java.net.Socket;
  * @author achmads23
  */
 public class ChatClient {
-
+    
     public static Socket conn;
 
     /**
@@ -26,10 +25,10 @@ public class ChatClient {
     public static void main(String[] args) throws IOException {
         conn = new Socket("10.151.34.139", 22001);
         System.out.println(conn);
-
+        
         Receiver receiver = new Receiver();
         receiver.start();
-
+        
         FormLogin login = new FormLogin();
         login.setVisible(true);
         receiver.setFormLogin(login);
