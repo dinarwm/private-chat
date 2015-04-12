@@ -6,12 +6,7 @@
 package forms;
 
 import connection.ChatList;
-import static forms.FormLogin.conn;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -20,14 +15,16 @@ import java.util.logging.Logger;
 public class FormOnline extends javax.swing.JFrame {
 
     private Object jTextField1;
-    private ArrayList<String> namas = new ArrayList<String>();
-    private ArrayList<String> ids = new ArrayList<String>();
+    private final ArrayList<String> namas;
+    private final ArrayList<String> ids;
 
     /**
      * Creates new form FormOnline
      */
     public FormOnline() {
         initComponents();
+        namas = new ArrayList<>();
+        ids = new ArrayList<>();
         taListOnline.setEditable(false);
     }
 
@@ -139,14 +136,8 @@ public class FormOnline extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormOnline.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormOnline.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormOnline.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormOnline.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            System.out.println("Error formonline main: " + ex.getMessage());
         }
         //</editor-fold>
 

@@ -5,12 +5,11 @@ package forms;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import main.ChatClient;
 
 /**
  *
@@ -18,16 +17,11 @@ import java.util.logging.Logger;
  */
 public class FormLogin extends javax.swing.JFrame {
 
-    static Socket conn;
-    public static String Tanda = "GAGAL";
-
     /**
      * Creates new form FormLogin
      *
-     * @param koneksi
      */
-    public FormLogin(Socket koneksi) {
-        conn = koneksi;
+    public FormLogin() {
         initComponents();
     }
 
@@ -97,17 +91,10 @@ public class FormLogin extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         DataOutputStream dos;
         try {
-            dos = new DataOutputStream(conn.getOutputStream());
+            dos = new DataOutputStream(ChatClient.conn.getOutputStream());
             String login = "login:" + jTextField1.getText();
             System.out.println(login);
             dos.write(login.getBytes());
-            DataInputStream dis;
-            dis = new DataInputStream(conn.getInputStream());
-            String string = dis.readLine();
-            if ("auth:1:Login success.".equals(string)) {
-                Tanda = "SUKSES";
-            }
-            this.dispose();
         } catch (IOException ex) {
             Logger.getLogger(FormLogin.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -129,14 +116,8 @@ public class FormLogin extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            System.out.println("Error formlogin main: " + ex.getMessage());
         }
         //</editor-fold>
 
@@ -144,7 +125,7 @@ public class FormLogin extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new FormLogin(conn).setVisible(true);
+                new FormLogin().setVisible(true);
             }
         });
     }

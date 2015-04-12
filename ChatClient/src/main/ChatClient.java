@@ -26,16 +26,12 @@ public class ChatClient {
     public static void main(String[] args) throws IOException {
         conn = new Socket("10.151.34.139", 22001);
         System.out.println(conn);
-        FormLogin Login = new FormLogin(conn);
-        Login.setVisible(true);
-        while (Login.isActive()) {
-        }
-        if ("SUKSES".equals(FormLogin.Tanda)) {
-            FormOnline online = new FormOnline();
-            online.setVisible(true);
-            Receiver receiver = new Receiver(online);
-            receiver.start();
-        }
 
+        Receiver receiver = new Receiver();
+        receiver.start();
+
+        FormLogin login = new FormLogin();
+        login.setVisible(true);
+        receiver.setFormLogin(login);
     }
 }
