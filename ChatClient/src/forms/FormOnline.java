@@ -6,7 +6,9 @@
 package forms;
 
 import connection.ChatList;
+import connection.Client;
 import java.util.ArrayList;
+import main.ChatClient;
 
 /**
  *
@@ -14,17 +16,14 @@ import java.util.ArrayList;
  */
 public class FormOnline extends javax.swing.JFrame {
 
-    private Object jTextField1;
-    private final ArrayList<String> namas;
-    private final ArrayList<String> ids;
+    private final ArrayList<Client> clients;
 
     /**
      * Creates new form FormOnline
      */
     public FormOnline() {
+        clients = new ArrayList<>();
         initComponents();
-        namas = new ArrayList<>();
-        ids = new ArrayList<>();
         taListOnline.setEditable(false);
     }
 
@@ -111,10 +110,13 @@ public class FormOnline extends javax.swing.JFrame {
 
     private void btnChatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChatActionPerformed
         String chat = tfChat.getText();
-        for (int i = 0; i < namas.size(); i++) {
-            if (namas.get(i).equals(chat)) {
-                String id = ids.get(i);
-                ChatList.OpenForm(namas.get(i), id);
+        for (Client client : clients) {
+            if (client.getNama().equals(chat)) {
+                if (chat.equals(ChatClient.username)) {
+                    System.out.println("Chat with other person!");
+                    return;
+                }
+                ChatList.OpenForm(client.getNama(), client.getId());
                 System.out.println("Cool!");
                 return;
             }
@@ -122,25 +124,30 @@ public class FormOnline extends javax.swing.JFrame {
         System.out.println("Wrong name.");
     }//GEN-LAST:event_btnChatActionPerformed
 
-    public String getNama(String id) {
-        for (int i = 0; i < ids.size(); i++) {
-            if (id.equals(ids.get(i))) {
-                return namas.get(i);
+    public Client getClient(String id) {
+        for (Client client : clients) {
+            if (id.equals(client.getId())) {
+                return client;
             }
         }
         return null;
     }
 
+    public String getNama(String id) {
+        Client client = getClient(id);
+        return client == null ? null : client.getNama();
+    }
+
     public void userUpdate(String users) {
         taListOnline.setText("");
-        namas.clear();
-        ids.clear();
-        int n = 0;
         for (String retval : users.split(":")) {
             String[] idnama = retval.split("#");
-            namas.add(idnama[1]);
-            ids.add(idnama[0]);
-            taListOnline.append(idnama[1] + "\n");
+            String id = (idnama[0]);
+            String nama = (idnama[1]);
+            if (getClient(id) == null) {
+                clients.add(new Client(id, nama));
+            }
+            taListOnline.append(nama + "\n");
         }
     }
 

@@ -70,10 +70,15 @@ public class Receiver implements Runnable {
                             while (formOnline == null);
                             parts = msg.split(":", 2);
                             String id = parts[0];
-                            String nama = formOnline.getNama(id);
                             String isi = parts[1];
+                            String nama = formOnline.getNama(id);
                             FormChat form = ChatList.OpenForm(nama, id);
                             form.chatUpdate(nama, isi);
+                            break;
+                        case "off":
+                            nama = formOnline.getNama(msg);
+                            form = ChatList.OpenForm(nama, msg);
+                            form.chatUpdate(nama + " is offline.");
                             break;
                     }
                 }

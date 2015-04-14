@@ -14,10 +14,10 @@ import main.ChatClient;
  * @author achmads23
  */
 public class FormChat extends javax.swing.JFrame {
-    
+
     private static String id = null;
     static String nama;
-    
+
     public FormChat(String nama, String id) {
         initComponents();
         taChat.setEditable(false);
@@ -117,11 +117,11 @@ public class FormChat extends javax.swing.JFrame {
             System.out.println("Error form client send: " + ex.getMessage());
         }
     }//GEN-LAST:event_btnSendActionPerformed
-    
+
     public void chatUpdate(String text) {
         taChat.append(text + "\n");
     }
-    
+
     public void chatUpdate(String nama, String msg) {
         this.chatUpdate(nama + "\t: " + msg);
     }
