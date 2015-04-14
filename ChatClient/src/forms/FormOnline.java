@@ -37,6 +37,7 @@ public class FormOnline extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jScrollPane2 = new javax.swing.JScrollPane();
         lblListOnline = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         taListOnline = new javax.swing.JTextArea();
@@ -45,6 +46,7 @@ public class FormOnline extends javax.swing.JFrame {
         btnChat = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("List Online");
 
         lblListOnline.setText("List Online");
 
@@ -145,6 +147,7 @@ public class FormOnline extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChat;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblListOnline;
     private javax.swing.JLabel lblWith;
     private javax.swing.JTextArea taListOnline;

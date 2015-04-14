@@ -123,7 +123,7 @@ public class FormChat extends javax.swing.JFrame {
     }
     
     public void chatUpdate(String nama, String msg) {
-        this.chatUpdate(nama + ": " + msg);
+        this.chatUpdate(nama + "\t: " + msg);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
