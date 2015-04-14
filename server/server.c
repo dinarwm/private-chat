@@ -18,7 +18,9 @@
 #define MAX_QUEUES 10
 #define MAX_THREADS 256
 #define MAX_NAME_LENGTH 10
-#define MAX_BUFFER 100
+#define MAX_BUFFER 2048
+#define LOGOUT_BUFFER 16
+#define USERS_BUFFER 1024
 
 typedef struct node_t {
 	int id;
@@ -31,13 +33,6 @@ typedef struct node_t {
 node_t *list;
 pthread_t threads[MAX_THREADS];
 /* End of global variables */
-
-/**
- * Initialize global variables.
- */
-void initialize() {
-	list = NULL;
-}
 
 /**
  * Get node from the list by given id. If it 
@@ -167,36 +162,6 @@ int pop(int id) {
 }
 
 /**
- * Soft override to write().
- *
- * @param int sockfd file descriptor of the sending socket.
- * @param void *buf message.
- * @param size_t len length of the message.
- *
- * @return ssize_t the number of characters sent.
- */
-ssize_t my_write(int sockfd, void *buf, size_t len) {
-	ssize_t ans;
-	ans = write(sockfd, buf, len);
-	return ans;
-}
-
-/**
- * Soft override to read().
- *
- * @param int fd file descriptor of the sender socket.
- * @param void *buf buffer that will filled with message.
- * @param size_t count max length of the message.
- *
- * @return ssize_t the number of bytes received.
- */
-ssize_t my_read(int fd, void *buf, size_t count) {
-	ssize_t ans;
-	ans = read(fd, buf, count);
-	return ans;
-}
-
-/**
  * Broadcast msg to all client.
  *
  * @param char *msg
@@ -204,7 +169,7 @@ ssize_t my_read(int fd, void *buf, size_t count) {
 void broadcast(char *msg) {
 	node_t *temp = list;
 	while (temp != NULL) {
-		my_write(temp->socketfd, msg, strlen(msg) + 1);
+		write(temp->socketfd, msg, strlen(msg) + 1);
 		temp = temp->next;
 	}
 }
@@ -215,7 +180,7 @@ void broadcast(char *msg) {
  * Then broadcast to all connected client.
  */
 void users() {
-	char ans[2048];
+	char ans[USERS_BUFFER];
 	sprintf(ans, "users");
 	node_t *temp = list;
 	while (temp != NULL) {
@@ -250,7 +215,7 @@ node_t *login(node_t *client, char buffer[]) {
 	if (strcmp(ptr, "login")) {
 		printf(" (%d) Wrong login format: '%s'.\n", client->id, ptr);
 		sprintf(buffer, "auth:0:Wrong login format.\r\n");
-		my_write(socketfd, buffer, strlen(buffer)+1);
+		write(socketfd, buffer, strlen(buffer)+1);
 		return NULL;
 	}
 
@@ -260,28 +225,28 @@ node_t *login(node_t *client, char buffer[]) {
 	if (strchr(ptr, ':') || strchr(ptr, '#')) {
 		printf(" (%d) Name contains forbidden character: '%s'.\n", client->id, ptr);
 		sprintf(buffer, "auth:0:Name invalid.\r\n");
-		my_write(socketfd, buffer, strlen(buffer)+1);
+		write(socketfd, buffer, strlen(buffer)+1);
 		return NULL;
 	} else if (strlen(ptr) > MAX_NAME_LENGTH) {
 		printf(" (%d) Name is too long: '%s'.\n", client->id, ptr);
 		sprintf(buffer, "auth:0:Name length more than %d.\r\n", MAX_NAME_LENGTH);
-		my_write(socketfd, buffer, strlen(buffer)+1);
+		write(socketfd, buffer, strlen(buffer)+1);
 		return NULL;
 	} else if (strlen(ptr) < 4) {
 		printf(" (%d) Name is too short: '%s'.\n", client->id, ptr);
 		sprintf(buffer, "auth:0:Name length less than 4.\r\n");
-		my_write(socketfd, buffer, strlen(buffer)+1);
+		write(socketfd, buffer, strlen(buffer)+1);
 		return NULL;
 	} else if (find_by_name(ptr) != NULL) {
 		printf(" (%d) Name alredy used: '%s'.\n", client->id, ptr);
 		sprintf(buffer, "auth:0:Name alredy used.\r\n");
-		my_write(socketfd, buffer, strlen(buffer)+1);
+		write(socketfd, buffer, strlen(buffer)+1);
 		return NULL;
 	}
 
 	strcpy(client->name, ptr);
 	sprintf(buffer, "auth:1:Login success.\r\n");
-	my_write(socketfd, buffer, strlen(buffer)+1);
+	write(socketfd, buffer, strlen(buffer)+1);
 
 	return client;
 }
@@ -295,7 +260,7 @@ node_t *login(node_t *client, char buffer[]) {
  */
 void logout(node_t *client) {
 	int id = client->id;
-	char buffer[16];
+	char buffer[LOGOUT_BUFFER];
 
 	close(client->socketfd);
 	printf(" (%d) Close client with socket descriptor %d.\n", id, client->socketfd);
@@ -321,7 +286,7 @@ void logout(node_t *client) {
  */
 void deliver(node_t *sender, char *msg) {
 	char temp[strlen(msg) + 25];
-	char buffer[100];
+	char buffer[MAX_BUFFER];
 
 	msg = strtok(NULL, ":\r\n");
 	int recipient_id = atoi(msg);
@@ -330,12 +295,12 @@ void deliver(node_t *sender, char *msg) {
 	if (recipient == NULL) {
 		printf(" (%d) User with %d is offline.\n", sender->id, recipient_id);
 		sprintf(buffer, "off:%d\r\n", recipient_id);
-		my_write(sender->socketfd, buffer, strlen(buffer) + 1);
+		write(sender->socketfd, buffer, strlen(buffer) + 1);
 	} else {
 		msg = strtok(NULL, "\r\n");
 		sprintf(temp, "rcv:%d:%s\r\n", sender->id, msg);
 		printf(" (%d) Send: rcv:%d:%s\n", sender->id, sender->id, msg);
-		my_write(recipient->socketfd, temp, strlen(temp) + 1);
+		write(recipient->socketfd, temp, strlen(temp) + 1);
 	}
 }
 
@@ -361,7 +326,7 @@ void *client_thread(void *arg) {
 	/* Login */
 	while (1) {
 		bzero(buffer, MAX_BUFFER);
-		ln = my_read(socketfd, buffer, MAX_BUFFER);
+		ln = read(socketfd, buffer, MAX_BUFFER);
 		if (ln == 0) {
 			printf(" (%d) Quit while login.\n", id);
 			logout(data);
@@ -385,7 +350,7 @@ void *client_thread(void *arg) {
 	while (ln > 0) {
 		/* Read message from client */
 		bzero(buffer, MAX_BUFFER);
-		ln = my_read(socketfd, buffer, MAX_BUFFER);
+		ln = read(socketfd, buffer, MAX_BUFFER);
 		if (ln <= 0) break;
 
 		/* Remove the trailing newline */
@@ -401,7 +366,7 @@ void *client_thread(void *arg) {
 			deliver(data, ptr);
 		} else {
 			sprintf(buffer, "error:Unknown command: '%s'.\r\n", ptr);
-			my_write(socketfd, buffer, strlen(buffer)+1);
+			write(socketfd, buffer, strlen(buffer)+1);
 			printf(" (%d) Send: Unknown command\n", id);
 		}
 	}
@@ -418,6 +383,7 @@ void *client_thread(void *arg) {
 int main(int argc, char const *argv[]) {
 	struct sockaddr_in servaddr;
 	int servsock;
+	list = NULL;
 
 	/* Create socket */
 	servsock = socket(AF_INET, SOCK_STREAM, 0);
