@@ -75,6 +75,7 @@ public class RSA {
         //enkripsi key
         byte[] encrypt = rsa.encrypt(pesan.getBytes());
         System.out.println("Chipertext: " + bytesToString(encrypt));
+        
         // dekripsi key
         byte[] decrypt = rsa.decrypt(encrypt);
         System.out.println("Decrypted String in Bytes: " + bytesToString(decrypt));

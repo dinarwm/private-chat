@@ -558,8 +558,6 @@ public class DES {
         byte[] received = encrypt(message, key);
         System.out.println("\treceived: "+hex(received));
         boolean result = false;
-        //boolean result = Arrays.equals(expected, received);
-        //System.out.println("\tverdict: "+(result?"PASS":"FAIL"));
         return result;
     }
     public static String toHex(String arg) throws UnsupportedEncodingException {
@@ -584,46 +582,14 @@ public class DES {
         for(int a=0;a<itung;a++){
             first_name = first_name + "00";
         }
-        //System.out.println("Hexa " + first_name);
         
         byte[] bytes = DatatypeConverter.parseHexBinary(first_name);
         String result= new String(bytes,"UTF-8");
-        //System.out.println(result);
         
-        /*
-        //System.out.println(first_name.length());
-        String keys;
-        keys = "";
-        for(int k = 0; k < first_name.length(); k++)
-        {
-            double ran = Math.random()*10;   
-            int rand = (int) ran;
-            keys = keys + rand;
-        }
-        keys = user_input.nextLine( );
-        keys = toHex(keys); //dadi hexa
-        //System.out.println("panjang " + first_name.length());
-        
-        System.out.println("Hexa " + keys);
-
-        byte[] bytes = DatatypeConverter.parseHexBinary(keys);
-        String results= new String(bytes,"UTF-8");
-        */
         test(
             parseBytes(first_name),
             parseBytes("b669 d033 6c3f 42b7")
         );
-    /*
-        test(
-            parseBytes("f3ed a6dc f8b7 9dd6 5be0 db8b 1e7b a551"),
-            parseBytes("b669 d033 6c3f 42b7 68e8 e937 b4a5 7546")
-        );
-
-        // This is the example from "The DES Algorithm Illustrated"
-        // by J. Orlin Grabbe, and his step-by-step walkthrough
-        // is invaluable for debugging the internals of your
-        // DES calculations:
-        //     http://orlingrabbe.com/des.htm
-        */
+    
     }
 }
