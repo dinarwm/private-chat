@@ -285,12 +285,8 @@ void logout(node_t *client) {
  * @param char *msg sent to server
  */
 void deliver(node_t *sender, char *msg) {
-	char *temp;
-	char *temptr;
+	char temp[strlen(msg) + 25];
 	char buffer[MAX_BUFFER];
-
-	temp = (char*)malloc(sizeof(char) * (strlen(msg) + 25));
-	temptr = temp;
 
 	msg = strtok(NULL, ":\r\n");
 	int recipient_id = atoi(msg);
@@ -303,8 +299,8 @@ void deliver(node_t *sender, char *msg) {
 	} else {
 		msg = strtok(NULL, "\r\n");
 		sprintf(temp, "rcv:%d:%s\r\n", sender->id, msg);
-		printf(" (%d) Send: %s\n", sender->id, temptr);
-		write(recipient->socketfd, temptr, strlen(temptr) + 1);
+		printf(" (%d) Send: rcv:%d:%s\n", sender->id, sender->id, msg);
+		write(recipient->socketfd, temp, strlen(temp) + 1);
 	}
 }
 
